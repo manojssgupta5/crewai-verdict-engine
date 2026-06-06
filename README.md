@@ -1,119 +1,383 @@
-# About the project
-## CrewAI Debate System
-Multi agent debate system built using CrewAI.
+# AI Debate Crew
 
-The system:
-- creates arguments for and against a topic
-- validates both arguments
-- judges the final debate
-- Sends the result through email
+An AI powered multi agent debate system built using CrewAI.
+The project simulates a structured debate between autonomous AI agents where each agent performs a specialized responsibility such as debating, validation, judgement, and email delivery.
 
-## Features
-- Multi agent debate workflow
-- Web search integration using DDGS/SerpAPI
-- Sequential task orchestration
-- Argument validation/review phase
-- Final judge decision with task delegation enablement
-- Email sending using SendGrid
+Instead of relying on a single LLM response, the system breaks reasoning into multiple stages. This improves output quality, separation of concerns, and explainability.
 
-## Project Structure
-crewai_debate/
-├── src/
-│   └── debate/
-│       ├── crew.py
-│       ├── main.py
-│       ├── tools/
-│       │   ├── web_search_tool.py
-│       │   └── sendgrid_tool.py
-│       └── config/
-│           ├── agents.yaml
-│           └── tasks.yaml
+---
+
+# Project Goal
+
+The goal of this project is to build a collaborative AI debate system where multiple autonomous agents independently research, argue, validate, and judge a debate topic.
+
+The system demonstrates how agent based architectures can improve reasoning workflows by separating responsibilities across specialized agents.
+
+The workflow includes:
+
+* Argument generation for both sides
+* Validation and fact checking
+* Final judgement
+* Automated email delivery
+
+This project also demonstrates:
+
+* Tool augmented AI agents
+* Multi step reasoning pipelines
+* Real world orchestration patterns
+* Config driven agent design
+
+---
+
+# Architecture
+
+```text
+                    +------------------+
+                    |   User Motion    |
+                    +------------------+
+                              |
+                              v
+                +------------------------+
+                |   Favor Debater Agent  |
+                +------------------------+
+                              |
+                              v
+            +--------------------------------+
+            | Favor Validation Agent         |
+            +--------------------------------+
+                              |
+                              v
+                +------------------------+
+                | Against Debater Agent  |
+                +------------------------+
+                              |
+                              v
+           +---------------------------------+
+           | Against Validation Agent        |
+           +---------------------------------+
+                              |
+                              v
+                    +----------------+
+                    | Judge Agent    |
+                    +----------------+
+                              |
+                              v
+                    +----------------+
+                    | Sender Agent   |
+                    +----------------+
+                              |
+                              v
+                         Email Result
+```
+
+---
+
+# Features
+
+* Multi agent debate execution
+* Real time web research
+* Validation and fact checking agents
+* Judge based final decision
+* Automated email sending
+* Config driven agents and tasks
+* Extendable architecture
+* Tool integrated CrewAI agents
+
+---
+
+# Tech Stack
+
+| Technology | Purpose                      |
+| ---------- | ---------------------------- |
+| Python     | Core language                |
+| CrewAI     | Multi agent orchestration    |
+| OpenAI API | LLM reasoning                |
+| SerpAPI    | Web search                   |
+| SendGrid   | Email delivery               |
+| YAML       | Agent and task configuration |
+
+---
+
+# Project Structure
+
+```text
+debate/
 │
-├── pyproject.toml
+├── crew.py
+├── main.py
+├── tools/
+│   ├── sendgrid_tool.py
+│   └── web_search_tool.py
+│
+├── config/
+│   ├── agents.yaml
+│   └── tasks.yaml
+│
 └── README.md
+```
 
-## Setup
+---
 
-## 1. Install CrewAI
-- pip install crewai
-Or
-- uv pip install crewai (Recommended)
+# Workflow
 
-## 2. Install Dependencies
-- uv add ddgs redis sendgrid serpapi
+The system executes tasks sequentially:
 
-### Environment Variables
-- Create `.env`
-- OPENAI_API_KEY=your_openai_key
-- SENDGRID_API_KEY=your_sendgrid_key
-- OPENAI_BASE_URL=<>
-- SERPAPI_API_KEY=your_serpapi_key
+1. Favor debater generates supporting arguments
+2. Favor validator reviews the arguments
+3. Against debater generates opposing arguments
+4. Against validator reviews the arguments
+5. Judge evaluates both sides
+6. Sender emails the final outcome
 
-### Run The Project
-crewai run
+This creates a layered reasoning pipeline instead of a single prompt response.
 
-### Agents
-- offline model is used here to SAVE COST
-- use ollama and there are plenty of offline model available
-- few names are:
-    1. codestral:latest
-    2. phi4:latest
-    qwen3:8b
-    mistral-nemo:latest
-    llama3:8b          
-    deepseek-r1:7b     
-    deepseek-coder:6.7b
-    gemma4:e4b
+---
 
-### supporting arguments
-Creates supporting arguments to save context of agent execution
+# Installation
 
-### Web Search Tool
-Uses:
-DDGS OR SerpAPI search
-Cached searches avoid repeated web requests (Redis is used but code is commented for future enhancement)
+## Clone Repository
 
-### Example Workflow
-Topic
-  ↓
-Supporting Argument
-  ↓
-Web search for fact-check
-  ↓
-Supporting Validation
-  ↓
-Opposing Argument
-  ↓
-Web search for fact-check
-  ↓
-Opposing Validation
-  ↓
-Final Judge Decision
-  ↓
-Send Email
+```bash
+git clone <your-repo-url>
+cd debate
+```
 
-# Useful Commands
+---
 
-### Install dependencies
-crewai install
+## Install Dependencies
 
-### Run crew
-crewai run
+```bash
+pip install crewai
+pip install openai
+pip install sendgrid
+pip install google-search-results
+pip install serpapi
+```
 
-### Notes
+---
 
-* `allow_delegation=False` is recommended unless autonomous delegation is required.
-* Web search cache is shared through Redis.
-* DDGS may occasionally fail due to provider instability or DNS/network issues (Use serpapi instead)
-* CrewAI verbose logs can appear repetitive due to live progress rendering.
+# Environment Variables
 
-### Recommended Improvements
+Create a `.env` file:
 
-Future enhancements:
-* Introduce Caching
-* Semantic search caching
-* Retry policies
-* Observability/tracing
-* Structured output validation
-* Async execution
-* Human review checkpoints
+```env
+OPENAI_API_KEY=
+SERPAPI_API_KEY=
+SENDGRID_API_KEY=
+EMAIL_ADDRESS=
+```
+
+---
+
+# Run Project
+
+```bash
+python main.py
+```
+
+---
+
+# Example Input
+
+```python
+inputs = {
+    "motion": "Supplement vitamins are best for the human body"
+}
+```
+
+---
+
+# Example Debate Flow
+
+```text
+Motion:
+Remote work is better than office work
+
+Favor Agent:
+Remote work improves flexibility and productivity.
+
+Against Agent:
+Office work improves collaboration and innovation.
+
+Validation Agents:
+Verify argument quality and factual accuracy.
+
+Judge:
+Evaluates the stronger position.
+
+Sender:
+Emails final decision.
+```
+
+---
+
+# Core Components
+
+## crew.py
+
+Defines:
+
+* agents
+* tasks
+* workflow orchestration
+* tool integrations
+
+Uses CrewAI sequential process execution.
+
+---
+
+## main.py
+
+Application entry point.
+
+Responsible for:
+
+* passing debate motion
+* starting crew execution
+* printing final result
+
+---
+
+## web_search_tool.py
+
+Provides real time web search capability using SerpAPI.
+
+Capabilities:
+
+* fetch latest information
+* retrieve statistics
+* gather supporting evidence
+
+The file also contains:
+
+* DuckDuckGo implementation
+* caching architecture
+* fallback search logic
+
+These are currently commented but show future scalability planning.
+
+---
+
+## sendgrid_tool.py
+
+Responsible for email delivery.
+
+Features:
+
+* SendGrid integration
+* environment based configuration
+* final debate result delivery
+
+---
+
+# Strengths of This Design
+
+## Separation of Concerns
+
+Each agent has a dedicated responsibility.
+
+## Better Reasoning
+
+Validation agents reduce hallucination risk.
+
+## Extendability
+
+Easy to add:
+
+* memory
+* moderation
+* RAG
+* analytics
+* APIs
+* human review
+
+## Real World Architecture
+
+Closer to production grade AI workflows than single prompt systems.
+
+---
+
+# Current Limitations
+
+| Limitation            | Impact              |
+| --------------------- | ------------------- |
+| Sequential execution  | Higher latency      |
+| No retry handling     | Failure sensitive   |
+| No structured outputs | Harder integrations |
+| No persistence layer  | No memory/history   |
+| No async execution    | Lower scalability   |
+
+---
+
+# Future Enhancements
+
+## Parallel Agent Execution
+
+Run favor and against debaters simultaneously.
+
+---
+
+## Add Memory Layer
+
+Use:
+
+* Redis
+* Vector DB
+* PostgreSQL
+
+For:
+
+* debate history
+* persistent memory
+* learning context
+
+---
+
+## Add RAG Support
+
+Enable agents to retrieve:
+
+* PDFs
+* research papers
+* internal documents
+
+---
+
+## Add Structured Outputs
+
+Use Pydantic models for machine readable responses.
+
+---
+
+## Add Observability
+
+Track:
+
+* execution metrics
+* latency
+* token usage
+* traces
+* failures
+
+---
+
+# Example Use Cases
+
+* AI research assistant
+* Policy analysis
+* Legal debate simulation
+* Education and learning
+* Decision support systems
+* Autonomous reasoning pipelines
+
+---
+
+# License
+
+MIT License
+
+---
+
+# Author
+
+Built using CrewAI and OpenAI based multi agent architecture.
